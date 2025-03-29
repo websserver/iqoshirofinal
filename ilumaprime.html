@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <!----push-->
+    <title>IQOS ILUMA PRIME</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+      .overlay-gradient {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at center,
+          rgba(64, 224, 208, 0) 30%,
+          rgba(0, 206, 209, 0.4) 70%
+        );
+        pointer-events: none;
+        z-index: 1;
+        touch-action: none;
+      }
+
+      .features-dropdown {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        font-family: 'IQOSSans-Bold', sans-serif;
+      }
+
+      .features-dropdown h2 {
+        color: #00A0DC;
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      .feature-item {
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 15px;
+      }
+
+      .feature-item:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .feature-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+      }
+
+      .feature-title {
+        color: #333;
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .feature-description {
+        color: #666;
+        font-size: 14px;
+        margin-left: 34px;
+      }
+
+      .toggle-features {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: #00A0DC;
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .title-container {
+        position: fixed;
+        top: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 1000;
+        width: 100%;
+      }
+
+      .title-container h1 {
+        color: #00A0DC;
+        font-family: 'IQOSSans-Bold', sans-serif;
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      }
+
+      .color-selector {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .color-option {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease;
+      }
+
+      .color-option:hover {
+        transform: scale(1.1);
+      }
+
+      .color-option.active {
+        border: 2px solid #00A0DC;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading">
+      <div>Carregando, por favor aguarde...</div>
+    </div>
+
+    <div class="frame">
+      <img src="iconheader.svg" alt="Frame">
+    </div>
+    <img style="margin-top: 5%;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
+
+    <div class="title-container">
+      <h1>IQOS ILUMA i PRIME</h1>
+      <div class="color-selector">
+        <div class="color-option" style="background-color: #2D3339;" data-color="navy" onclick="changeColor('navy')"></div>
+        <div class="color-option" style="background-color: #8B9C3C;" data-color="olive" onclick="changeColor('olive')"></div>
+        <div class="color-option" style="background-color: #8B90C5;" data-color="jacaranda" onclick="changeColor('jacaranda')"></div>
+        <div class="color-option" style="background-color: #B84C39;" data-color="rooibos" onclick="changeColor('rooibos')"></div>
+        <div class="color-option" style="background-color: #7EC4BC;" data-color="turquoise" onclick="changeColor('turquoise')"></div>
+      </div>
+    </div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: ./markers/targets.mind; 
+      filterMinCF: 0.01; 
+      filterBeta: 800;
+      warmupTolerance: 10;
+      missTolerance: 25;
+      smoothCount: 70;
+      smoothTolerance: 0.01;
+      smoothThreshold: 1;
+      maxTrack: 1;
+      minDetectionConfidence: 0.3;
+      maxDetectionConfidence: 0.95;
+      trackingMethod: best;
+      trackingSmoothingFactor: 0.7;
+      trackingThreshold: 0.3;
+      trackingTimeout: 1000;
+      trackingResetTimeout: 3000;
+      trackingResetThreshold: 0.1;
+      debugUIEnabled: true"
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="modelo" src="modelo3d/modelo3_prime/navy-blazer.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- Container principal para estabilização -->
+        <a-entity id="modelo-container" position="0 0 0">
+          <!-- Pontos de ancoragem para estabilização -->
+          <a-box position="-0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
+          <a-box position="0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
+          <a-box position="0 0.5 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
+          <a-box position="0 -0.5 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
+          
+          <!-- Modelo 3D centralizado -->
+          <a-entity 
+            id="modelo3d-1" 
+            gltf-model="#modelo"
+            position="0 0 0.1" 
+            rotation="0 0 0" 
+            scale="8 8 8" 
+            class="clickable"
+            visible="true"
+            animation-mixer
+            animation="property: position; dur: 300; easing: easeOutQuad"
+            gesture-handler-custom="minScale: 4; maxScale: 12; rotationSensitivity: 0.2; scaleSensitivity: 0.08"
+            model-loaded="onModelLoaded"
+            model-error="onModelError">
+          </a-entity>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+
+    <div class="overlay-gradient"></div>
+
+    <button class="toggle-features" onclick="toggleFeatures()">i</button>
+
+    <div class="features-dropdown" style="display: none;">
+      <h2>O IQOS ILUMA i PRIME apresenta novas funcionalidades:</h2>
+      
+      <div class="feature-item">
+        <div class="feature-header">
+          <img src="icons/touch.svg" alt="Ecrã Tátil" class="feature-icon">
+          <div class="feature-title">Ecrã Tátil</div>
+        </div>
+        <div class="feature-description">
+          Verifique o estado do equipamento e personalize a sua experiência.
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header">
+          <img src="icons/pause.svg" alt="Modo Pausa" class="feature-icon">
+          <div class="feature-title">Modo Pausa</div>
+        </div>
+        <div class="feature-description">
+          Pausar e retomar a utilização, em qualquer momento.
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header">
+          <img src="icons/puff.svg" alt="FlexPuff" class="feature-icon">
+          <div class="feature-title">FlexPuff</div>
+        </div>
+        <div class="feature-description">
+          Permite até 4 aspirações extra**.
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header">
+          <img src="icons/battery.svg" alt="FlexBattery" class="feature-icon">
+          <div class="feature-title">FlexBattery</div>
+        </div>
+        <div class="feature-description">
+          Prolongue o tempo de vida útil da bateria do equipamento até um ano*** ou obtenha até 3 utilizações consecutivas****.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sceneEl = document.querySelector('a-scene');
+      const modelo = document.querySelector('#modelo3d-1');
+      const target = document.querySelector('a-entity[mindar-image-target]');
+
+      // Debug events
+      modelo.addEventListener('model-loaded', function() {
+        console.log('Modelo 3D carregado com sucesso');
+        modelo.setAttribute('visible', true);
+        modelo.object3D.visible = true;
+      });
+
+      modelo.addEventListener('model-error', function(error) {
+        console.error('Erro ao carregar o modelo 3D:', error);
+      });
+
+      sceneEl.addEventListener('arReady', function() {
+        console.log('MindAR está pronto');
+      });
+
+      sceneEl.addEventListener('arError', function(error) {
+        console.error('Erro no MindAR:', error);
+      });
+
+      // Target events
+      target.addEventListener('targetFound', function() {
+        console.log('Marcador encontrado');
+        modelo.setAttribute('visible', true);
+        modelo.object3D.visible = true;
+        modelo.object3D.updateMatrixWorld(true);
+      });
+
+      target.addEventListener('targetLost', function() {
+        console.log('Marcador perdido');
+        modelo.setAttribute('visible', false);
+        modelo.object3D.visible = false;
+      });
+
+      AFRAME.registerComponent('gesture-handler-custom', {
+        schema: {
+          minScale: { type: 'number', default: 4 },
+          maxScale: { type: 'number', default: 12 },
+          rotationSensitivity: { type: 'number', default: 0.3 },
+          scaleSensitivity: { type: 'number', default: 0.1 }
+        },
+        init: function() {
+          this.touchStartX = 0;
+          this.touchStartY = 0;
+          this.touchStartDistance = 0;
+          this.currentRotation = { x: 0, y: 0, z: 0 };
+          this.currentScale = 8;
+          
+          this.el.addEventListener('touchstart', this.onTouchStart.bind(this));
+          this.el.addEventListener('touchmove', this.onTouchMove.bind(this));
+          this.el.addEventListener('touchend', this.onTouchEnd.bind(this));
+
+          sceneEl.addEventListener('touchstart', this.onTouchStart.bind(this));
+          sceneEl.addEventListener('touchmove', this.onTouchMove.bind(this));
+          sceneEl.addEventListener('touchend', this.onTouchEnd.bind(this));
+        },
+        onTouchStart: function(event) {
+          const isVisible = this.el.getAttribute('visible');
+          if (!isVisible) return;
+
+          if (event.touches.length === 1) {
+            this.touchStartX = event.touches[0].clientX;
+            this.touchStartY = event.touches[0].clientY;
+          } else if (event.touches.length === 2) {
+            this.touchStartDistance = Math.hypot(
+              event.touches[0].clientX - event.touches[1].clientX,
+              event.touches[0].clientY - event.touches[1].clientY
+            );
+          }
+        },
+        onTouchMove: function(event) {
+          event.preventDefault();
+          
+          const isVisible = this.el.getAttribute('visible');
+          if (!isVisible) return;
+          
+          if (event.touches.length === 1) {
+            const deltaX = event.touches[0].clientX - this.touchStartX;
+            const deltaY = event.touches[0].clientY - this.touchStartY;
+            
+            this.currentRotation.y += deltaX * this.data.rotationSensitivity;
+            this.currentRotation.x += deltaY * this.data.rotationSensitivity;
+            
+            this.el.setAttribute('rotation', this.currentRotation);
+            
+            this.touchStartX = event.touches[0].clientX;
+            this.touchStartY = event.touches[0].clientY;
+          } else if (event.touches.length === 2) {
+            const currentDistance = Math.hypot(
+              event.touches[0].clientX - event.touches[1].clientX,
+              event.touches[0].clientY - event.touches[1].clientY
+            );
+            
+            const delta = currentDistance - this.touchStartDistance;
+            this.currentScale = Math.max(
+              this.data.minScale,
+              Math.min(this.data.maxScale, this.currentScale + delta * this.data.scaleSensitivity)
+            );
+            
+            this.el.setAttribute('scale', `${this.currentScale} ${this.currentScale} ${this.currentScale}`);
+            this.touchStartDistance = currentDistance;
+          }
+        },
+        onTouchEnd: function(event) {
+          this.touchStartX = 0;
+          this.touchStartY = 0;
+          this.touchStartDistance = 0;
+        }
+      });
+
+      // Componente para suavizar a posição
+      AFRAME.registerComponent('smooth-position', {
+        schema: {
+          smoothFactor: { type: 'number', default: 0.15 }
+        },
+
+        init: function() {
+          this.targetPosition = new THREE.Vector3();
+          this.currentPosition = new THREE.Vector3();
+          this.el.object3D.getWorldPosition(this.currentPosition);
+          this.isVisible = false;
+          this.lastUpdateTime = 0;
+          this.minUpdateInterval = 1000 / 30; // Voltar para 30 FPS
+          this.positionHistory = [];
+          this.maxHistoryLength = 3; // Reduzir histórico
+        },
+
+        tick: function(time) {
+          const isVisible = this.el.getAttribute('visible');
+          if (!isVisible) {
+            this.isVisible = false;
+            return;
+          }
+
+          if (!this.isVisible) {
+            this.isVisible = true;
+            this.el.object3D.getWorldPosition(this.currentPosition);
+          }
+
+          // Limitar a frequência de atualização
+          if (time - this.lastUpdateTime < this.minUpdateInterval) {
+            return;
+          }
+          this.lastUpdateTime = time;
+
+          this.el.object3D.getWorldPosition(this.targetPosition);
+          
+          // Adicionar à história de posições
+          this.positionHistory.push(this.targetPosition.clone());
+          if (this.positionHistory.length > this.maxHistoryLength) {
+            this.positionHistory.shift();
+          }
+
+          // Calcular média das últimas posições
+          const averagePosition = new THREE.Vector3();
+          this.positionHistory.forEach(pos => {
+            averagePosition.add(pos);
+          });
+          averagePosition.divideScalar(this.positionHistory.length);
+
+          // Suavizar em direção à média
+          this.currentPosition.lerp(averagePosition, this.data.smoothFactor);
+          this.el.object3D.position.copy(this.currentPosition);
+        }
+      });
+
+      // Componente para suavizar a rotação
+      AFRAME.registerComponent('smooth-rotation', {
+        schema: {
+          smoothFactor: { type: 'number', default: 0.15 }
+        },
+
+        init: function() {
+          this.targetRotation = new THREE.Quaternion();
+          this.currentRotation = new THREE.Quaternion();
+          this.el.object3D.getWorldQuaternion(this.currentRotation);
+          this.isVisible = false;
+          this.lastUpdateTime = 0;
+          this.minUpdateInterval = 1000 / 30; // Voltar para 30 FPS
+          this.rotationHistory = [];
+          this.maxHistoryLength = 3; // Reduzir histórico
+        },
+
+        tick: function(time) {
+          const isVisible = this.el.getAttribute('visible');
+          if (!isVisible) {
+            this.isVisible = false;
+            return;
+          }
+
+          if (!this.isVisible) {
+            this.isVisible = true;
+            this.el.object3D.getWorldQuaternion(this.currentRotation);
+          }
+
+          // Limitar a frequência de atualização
+          if (time - this.lastUpdateTime < this.minUpdateInterval) {
+            return;
+          }
+          this.lastUpdateTime = time;
+
+          this.el.object3D.getWorldQuaternion(this.targetRotation);
+          
+          // Adicionar à história de rotações
+          this.rotationHistory.push(this.targetRotation.clone());
+          if (this.rotationHistory.length > this.maxHistoryLength) {
+            this.rotationHistory.shift();
+          }
+
+          // Calcular média das últimas rotações
+          const averageRotation = new THREE.Quaternion();
+          this.rotationHistory.forEach(rot => {
+            averageRotation.multiply(rot);
+          });
+          averageRotation.normalize();
+
+          // Suavizar em direção à média
+          this.currentRotation.slerp(averageRotation, this.data.smoothFactor);
+          this.el.object3D.setRotationFromQuaternion(this.currentRotation);
+        }
+      });
+
+      function toggleFeatures() {
+        const dropdown = document.querySelector('.features-dropdown');
+        const currentDisplay = dropdown.style.display;
+        dropdown.style.display = currentDisplay === 'none' ? 'block' : 'none';
+      }
+
+      function changeColor(color) {
+        // Remover classe active de todas as opções
+        document.querySelectorAll('.color-option').forEach(option => {
+          option.classList.remove('active');
+        });
+        
+        // Adicionar classe active à opção selecionada
+        document.querySelector(`[data-color="${color}"]`).classList.add('active');
+        
+        // Aqui você pode adicionar lógica adicional para mudar a cor do modelo 3D
+        console.log('Cor selecionada:', color);
+      }
+
+      // Adiciona lógica de estabilização
+      AFRAME.registerComponent('stabilizer', {
+        init: function() {
+          this.lastPosition = new THREE.Vector3();
+          this.lastRotation = new THREE.Euler();
+          this.smoothingFactor = 0.2;
+        },
+        
+        tick: function() {
+          const container = document.querySelector('#modelo-container');
+          if (!container) return;
+
+          const currentPosition = container.object3D.position;
+          const currentRotation = container.object3D.rotation;
+
+          // Suaviza a posição
+          currentPosition.lerp(this.lastPosition, this.smoothingFactor);
+          
+          // Suaviza a rotação
+          currentRotation.x = THREE.MathUtils.lerp(currentRotation.x, this.lastRotation.x, this.smoothingFactor);
+          currentRotation.y = THREE.MathUtils.lerp(currentRotation.y, this.lastRotation.y, this.smoothingFactor);
+          currentRotation.z = THREE.MathUtils.lerp(currentRotation.z, this.lastRotation.z, this.smoothingFactor);
+
+          // Atualiza as últimas posições
+          this.lastPosition.copy(currentPosition);
+          this.lastRotation.copy(currentRotation);
+        }
+      });
+
+      // Aplica o componente de estabilização ao container
+      document.querySelector('#modelo-container').setAttribute('stabilizer', '');
+    </script>
+
+    <script src="js/ilumaprime.js"></script>
+    <script src="js/color-switcher.js"></script>
+    <script>
+      // Inicializa a cor padrão como navy
+      window.addEventListener('load', function() {
+        console.log('Inicializando cor padrão...');
+        // Pequeno delay para garantir que a cena A-Frame esteja pronta
+        setTimeout(() => {
+          changeColor('navy');
+        }, 1000);
+      });
+
+      // Adiciona listener para erros de carregamento
+      window.addEventListener('error', function(e) {
+        console.error('Erro global:', e.message);
+        if (e.filename) {
+          console.error('Arquivo:', e.filename);
+        }
+      });
+
+      // Monitora o estado da cena
+      document.querySelector('a-scene').addEventListener('loaded', function () {
+        console.log('A-Frame scene loaded');
+        document.querySelector('#modelo3d-1').object3D.visible = true;
+      });
+    </script>
+  </body>
+</html> 

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR.js Teste</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Incluindo A-Frame -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- Incluindo AR.js -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <style>
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .loading div {
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        color: #333;
+      }
+
+      .ar-controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .ar-button {
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 20px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+
+      .ar-button:hover {
+        background: rgba(255, 255, 255, 0.9);
+      }
+    </style>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <div class="loading">
+      <div>Carregando, por favor aguarde...</div>
+    </div>
+
+    <div class="ar-controls">
+      <button class="ar-button" onclick="rotateLeft()">⟲ Rodar Esquerda</button>
+      <button class="ar-button" onclick="rotateRight()">⟳ Rodar Direita</button>
+      <button class="ar-button" onclick="scaleUp()">+ Aumentar</button>
+      <button class="ar-button" onclick="scaleDown()">- Diminuir</button>
+    </div>
+
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      renderer="logarithmicDepthBuffer: true;"
+      vr-mode-ui="enabled: false">
+      
+      <a-assets>
+        <a-asset-item id="modelo" src="modelo3d/modelo.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- Usando o marcador Hiro padrão -->
+      <a-marker preset="hiro">
+        <a-entity
+          id="modelo3d"
+          gltf-model="#modelo"
+          position="0 0 0"
+          rotation="0 0 0"
+          scale="8 8 8">
+        </a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      // Remover tela de loading quando o modelo carregar
+      document.querySelector('#modelo3d').addEventListener('model-loaded', function() {
+        document.querySelector('.loading').style.display = 'none';
+      });
+
+      // Funções de controle
+      let currentRotation = 0;
+      let currentScale = 8;
+      const modelo = document.querySelector('#modelo3d');
+
+      function rotateLeft() {
+        currentRotation -= 45;
+        modelo.setAttribute('rotation', `0 ${currentRotation} 0`);
+      }
+
+      function rotateRight() {
+        currentRotation += 45;
+        modelo.setAttribute('rotation', `0 ${currentRotation} 0`);
+      }
+
+      function scaleUp() {
+        currentScale = Math.min(currentScale * 1.2, 16);
+        modelo.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+      }
+
+      function scaleDown() {
+        currentScale = Math.max(currentScale * 0.8, 4);
+        modelo.setAttribute('scale', `${currentScale} ${currentScale} ${currentScale}`);
+      }
+    </script>
+  </body>
+</html> 
