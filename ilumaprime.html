@@ -156,10 +156,10 @@
     <div class="frame">
       <img src="iconheader.svg" alt="Frame">
     </div>
-    <img style="margin-top: 5%;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
+    <img style="margin-top: 5%; width: 200px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
 
     <div class="title-container">
-      <h1>IQOS ILUMA i PRIME</h1>
+      <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">IQOS ILUMA i PRIME</h1>
       <div class="color-selector">
         <div class="color-option" style="background-color: #2D3339;" data-color="navy" onclick="changeColor('navy')"></div>
         <div class="color-option" style="background-color: #8B9C3C;" data-color="olive" onclick="changeColor('olive')"></div>
@@ -391,7 +391,7 @@
       // Componente para suavizar a posição
       AFRAME.registerComponent('smooth-position', {
         schema: {
-          smoothFactor: { type: 'number', default: 0.15 }
+          smoothFactor: { type: 'number', default: 0.08 }
         },
 
         init: function() {
@@ -400,24 +400,28 @@
           this.el.object3D.getWorldPosition(this.currentPosition);
           this.isVisible = false;
           this.lastUpdateTime = 0;
-          this.minUpdateInterval = 1000 / 30; // Voltar para 30 FPS
+          this.minUpdateInterval = 1000 / 60; // Aumentar para 60 FPS
           this.positionHistory = [];
-          this.maxHistoryLength = 3; // Reduzir histórico
+          this.maxHistoryLength = 5; // Aumentar histórico para mais suavidade
+          this.velocityDamping = 0.85; // Adicionar amortecimento de velocidade
+          this.velocity = new THREE.Vector3();
         },
 
         tick: function(time) {
           const isVisible = this.el.getAttribute('visible');
           if (!isVisible) {
             this.isVisible = false;
+            this.velocity.set(0, 0, 0);
             return;
           }
 
           if (!this.isVisible) {
             this.isVisible = true;
             this.el.object3D.getWorldPosition(this.currentPosition);
+            this.positionHistory = [];
+            this.velocity.set(0, 0, 0);
           }
 
-          // Limitar a frequência de atualização
           if (time - this.lastUpdateTime < this.minUpdateInterval) {
             return;
           }
@@ -425,21 +429,41 @@
 
           this.el.object3D.getWorldPosition(this.targetPosition);
           
-          // Adicionar à história de posições
-          this.positionHistory.push(this.targetPosition.clone());
+          // Adicionar à história de posições com peso
+          this.positionHistory.push({
+            position: this.targetPosition.clone(),
+            weight: 1.0
+          });
+          
           if (this.positionHistory.length > this.maxHistoryLength) {
             this.positionHistory.shift();
           }
 
-          // Calcular média das últimas posições
+          // Calcular média ponderada das últimas posições
           const averagePosition = new THREE.Vector3();
-          this.positionHistory.forEach(pos => {
-            averagePosition.add(pos);
+          let totalWeight = 0;
+          
+          this.positionHistory.forEach((entry, index) => {
+            const weight = entry.weight * (index + 1); // Posições mais recentes têm mais peso
+            averagePosition.add(entry.position.multiplyScalar(weight));
+            totalWeight += weight;
           });
-          averagePosition.divideScalar(this.positionHistory.length);
+          
+          averagePosition.divideScalar(totalWeight);
 
-          // Suavizar em direção à média
+          // Calcular velocidade atual
+          this.velocity.subVectors(averagePosition, this.currentPosition);
+          
+          // Aplicar amortecimento à velocidade
+          this.velocity.multiplyScalar(this.velocityDamping);
+          
+          // Atualizar posição atual com velocidade amortecida
+          this.currentPosition.add(this.velocity);
+          
+          // Aplicar suavização adicional
           this.currentPosition.lerp(averagePosition, this.data.smoothFactor);
+          
+          // Aplicar a posição final
           this.el.object3D.position.copy(this.currentPosition);
         }
       });
@@ -447,7 +471,7 @@
       // Componente para suavizar a rotação
       AFRAME.registerComponent('smooth-rotation', {
         schema: {
-          smoothFactor: { type: 'number', default: 0.15 }
+          smoothFactor: { type: 'number', default: 0.08 }
         },
 
         init: function() {
@@ -456,24 +480,28 @@
           this.el.object3D.getWorldQuaternion(this.currentRotation);
           this.isVisible = false;
           this.lastUpdateTime = 0;
-          this.minUpdateInterval = 1000 / 30; // Voltar para 30 FPS
+          this.minUpdateInterval = 1000 / 60; // Aumentar para 60 FPS
           this.rotationHistory = [];
-          this.maxHistoryLength = 3; // Reduzir histórico
+          this.maxHistoryLength = 5; // Aumentar histórico para mais suavidade
+          this.angularVelocity = new THREE.Vector3();
+          this.velocityDamping = 0.85; // Adicionar amortecimento de velocidade
         },
 
         tick: function(time) {
           const isVisible = this.el.getAttribute('visible');
           if (!isVisible) {
             this.isVisible = false;
+            this.angularVelocity.set(0, 0, 0);
             return;
           }
 
           if (!this.isVisible) {
             this.isVisible = true;
             this.el.object3D.getWorldQuaternion(this.currentRotation);
+            this.rotationHistory = [];
+            this.angularVelocity.set(0, 0, 0);
           }
 
-          // Limitar a frequência de atualização
           if (time - this.lastUpdateTime < this.minUpdateInterval) {
             return;
           }
@@ -481,24 +509,80 @@
 
           this.el.object3D.getWorldQuaternion(this.targetRotation);
           
-          // Adicionar à história de rotações
-          this.rotationHistory.push(this.targetRotation.clone());
+          // Adicionar à história de rotações com peso
+          this.rotationHistory.push({
+            rotation: this.targetRotation.clone(),
+            weight: 1.0
+          });
+          
           if (this.rotationHistory.length > this.maxHistoryLength) {
             this.rotationHistory.shift();
           }
 
-          // Calcular média das últimas rotações
+          // Calcular média ponderada das últimas rotações
           const averageRotation = new THREE.Quaternion();
-          this.rotationHistory.forEach(rot => {
-            averageRotation.multiply(rot);
+          let totalWeight = 0;
+          
+          this.rotationHistory.forEach((entry, index) => {
+            const weight = entry.weight * (index + 1);
+            THREE.Quaternion.slerp(averageRotation, entry.rotation, averageRotation, weight / (totalWeight + weight));
+            totalWeight += weight;
           });
-          averageRotation.normalize();
 
-          // Suavizar em direção à média
+          // Aplicar suavização com amortecimento
           this.currentRotation.slerp(averageRotation, this.data.smoothFactor);
+          
+          // Aplicar a rotação final
           this.el.object3D.setRotationFromQuaternion(this.currentRotation);
         }
       });
+
+      // Componente de estabilização geral
+      AFRAME.registerComponent('stabilizer', {
+        init: function() {
+          this.lastPosition = new THREE.Vector3();
+          this.lastRotation = new THREE.Euler();
+          this.smoothingFactor = 0.1; // Reduzir para mais suavidade
+          this.positionThreshold = 0.001; // Limiar para mudanças de posição
+          this.rotationThreshold = 0.001; // Limiar para mudanças de rotação
+        },
+        
+        tick: function() {
+          const container = document.querySelector('#modelo-container');
+          if (!container) return;
+
+          const currentPosition = container.object3D.position;
+          const currentRotation = container.object3D.rotation;
+
+          // Verificar se a mudança é significativa
+          const positionDelta = currentPosition.distanceTo(this.lastPosition);
+          const rotationDelta = Math.max(
+            Math.abs(currentRotation.x - this.lastRotation.x),
+            Math.abs(currentRotation.y - this.lastRotation.y),
+            Math.abs(currentRotation.z - this.lastRotation.z)
+          );
+
+          // Aplicar suavização apenas se a mudança for significativa
+          if (positionDelta > this.positionThreshold) {
+            currentPosition.lerp(this.lastPosition, this.smoothingFactor);
+          }
+          
+          if (rotationDelta > this.rotationThreshold) {
+            currentRotation.x = THREE.MathUtils.lerp(currentRotation.x, this.lastRotation.x, this.smoothingFactor);
+            currentRotation.y = THREE.MathUtils.lerp(currentRotation.y, this.lastRotation.y, this.smoothingFactor);
+            currentRotation.z = THREE.MathUtils.lerp(currentRotation.z, this.lastRotation.z, this.smoothingFactor);
+          }
+
+          // Atualizar as últimas posições
+          this.lastPosition.copy(currentPosition);
+          this.lastRotation.copy(currentRotation);
+        }
+      });
+
+      // Aplica os componentes de suavização ao container do modelo
+      document.querySelector('#modelo-container').setAttribute('stabilizer', '');
+      document.querySelector('#modelo-container').setAttribute('smooth-position', '');
+      document.querySelector('#modelo-container').setAttribute('smooth-rotation', '');
 
       function toggleFeatures() {
         const dropdown = document.querySelector('.features-dropdown');
@@ -518,38 +602,6 @@
         // Aqui você pode adicionar lógica adicional para mudar a cor do modelo 3D
         console.log('Cor selecionada:', color);
       }
-
-      // Adiciona lógica de estabilização
-      AFRAME.registerComponent('stabilizer', {
-        init: function() {
-          this.lastPosition = new THREE.Vector3();
-          this.lastRotation = new THREE.Euler();
-          this.smoothingFactor = 0.2;
-        },
-        
-        tick: function() {
-          const container = document.querySelector('#modelo-container');
-          if (!container) return;
-
-          const currentPosition = container.object3D.position;
-          const currentRotation = container.object3D.rotation;
-
-          // Suaviza a posição
-          currentPosition.lerp(this.lastPosition, this.smoothingFactor);
-          
-          // Suaviza a rotação
-          currentRotation.x = THREE.MathUtils.lerp(currentRotation.x, this.lastRotation.x, this.smoothingFactor);
-          currentRotation.y = THREE.MathUtils.lerp(currentRotation.y, this.lastRotation.y, this.smoothingFactor);
-          currentRotation.z = THREE.MathUtils.lerp(currentRotation.z, this.lastRotation.z, this.smoothingFactor);
-
-          // Atualiza as últimas posições
-          this.lastPosition.copy(currentPosition);
-          this.lastRotation.copy(currentRotation);
-        }
-      });
-
-      // Aplica o componente de estabilização ao container
-      document.querySelector('#modelo-container').setAttribute('stabilizer', '');
     </script>
 
     <script src="js/ilumaprime.js"></script>
