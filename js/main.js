@@ -60,19 +60,19 @@ function showModelInfo(index) {
   // Atualizar informações baseado no modelo
   switch(index) {
     case 0:
-      modelName.textContent = 'ILUMA PRIME';
-      modelButton.textContent = 'Personalizar ILUMA I PRIME';
-      modelButton.onclick = () => window.open('https://www.iqos.com/pt/pt/iluma-prime', '_blank');
+      modelName.textContent = 'ILUMA i ONE';
+      modelButton.textContent = 'Personalizar ILUMA i ONE';
+      modelButton.onclick = () => window.open('iqoshirofinal/ilumaone.html');
       break;
     case 1:
-      modelName.textContent = 'ILUMA';
-      modelButton.textContent = 'Personalizar  ILUMA I ONE ';
-      modelButton.onclick = () => window.open('https://www.iqos.com/pt/pt/iluma', '_blank');
+      modelName.textContent = 'ILUMA i';
+      modelButton.textContent = 'Personalizar  ILUMA i';
+      modelButton.onclick = () => window.open('iqoshirofinal/ilumai.html');
       break;
     case 2:
-      modelName.textContent = 'ILUMA ONE';
-      modelButton.textContent = 'Personalizar ILUMA I PRIME';
-      modelButton.onclick = () => window.open('iqoshirofinal/ilumaprime.html', '_blank');
+      modelName.textContent = 'ILUMA i PRIME';
+      modelButton.textContent = 'Personalizar ILUMA i PRIME';
+      modelButton.onclick = () => window.open('iqoshirofinal/ilumaprime.html');
       break;
   }
   
@@ -101,13 +101,13 @@ function handleModelClick(index) {
       // Restaurar posição original quando não estiver selecionado
       switch(i) {
         case 0:
-          model.setAttribute('position', '-0.3 0 0');
+          model.setAttribute('position', '-0.1 0 0');
           break;
         case 1:
           model.setAttribute('position', '0 0 0');
           break;
         case 2:
-          model.setAttribute('position', '0.3 0 0');
+          model.setAttribute('position', '0.1 0 0');
           break;
       }
     }
