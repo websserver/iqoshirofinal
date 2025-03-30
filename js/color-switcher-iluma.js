@@ -1,10 +1,10 @@
 // Mapeamento de cores para modelos
 const colorToModel = {
-    'navy': 'modelo2/navy-blazer.glb',
-    'olive': 'modelo2/olive-green.glb',
-    'jacaranda': 'modelo2/jacaranda.glb',
-    'rooibos': 'modelo2/rooibos-tea.glb',
-    'turquoise': 'modelo2/pastel-turquoise.glb'
+    'navy': 'modelo3d/modelo2/navy-blazer.glb',
+    'olive': 'modelo3d/modelo2/olive-green.glb',
+    'jacaranda': 'modelo3d/modelo2/jacaranda.glb',
+    'rooibos': 'modelo3d/modelo2/rooibos-tea.glb',
+    'turquoise': 'modelo3d/modelo2/pastel-turquoise.glb'
 };
 
 // Função para trocar a cor do modelo
