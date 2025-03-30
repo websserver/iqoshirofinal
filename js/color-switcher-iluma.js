@@ -1,10 +1,10 @@
 // Mapeamento de cores para modelos
 const colorToModel = {
-    'navy': 'modelo2/modelo_IQOS ILUMA ONE/navy-blazer.glb',
-    'olive': 'modelo2/modelo_IQOS ILUMA ONE/olive-green.glb',
-    'jacaranda': 'modelo2/modelo_IQOS ILUMA ONE/jacaranda.glb',
-    'rooibos': 'modelo2/modelo_IQOS ILUMA ONE/rooibos-tea.glb',
-    'turquoise': 'modelo2/modelo_IQOS ILUMA ONE/pastel-turquoise.glb'
+    'navy': 'modelo2/navy-blazer.glb',
+    'olive': 'modelo2/olive-green.glb',
+    'jacaranda': 'modelo2/jacaranda.glb',
+    'rooibos': 'modelo2/rooibos-tea.glb',
+    'turquoise': 'modelo2/pastel-turquoise.glb'
 };
 
 // Função para trocar a cor do modelo
