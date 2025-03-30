@@ -47,6 +47,7 @@
         margin: 0 0 15px 0;
         font-size: 18px;
         text-align: center;
+        font-family: 'IQOSSans-Bold', sans-serif;
       }
 
       .feature-item {
@@ -90,7 +91,7 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        width: 208px;
+        width: 140px;
         height: 44px;
         background: rgba(0, 0, 0, 0.7);
         border: none;
@@ -104,6 +105,7 @@
         cursor: pointer;
         z-index: 1001;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-family: 'IQOSSans-Bold', sans-serif;
       }
 
       .title-container {
@@ -114,6 +116,7 @@
         text-align: center;
         z-index: 1000;
         width: 100%;
+        font-family: 'IQOSSans-Bold', sans-serif;
       }
 
       .title-container h1 {
@@ -158,7 +161,7 @@
     <div class="frame">
       <img src="iconheader.svg" alt="Frame">
     </div>
-    <img style="margin-top: 18%; width: 80px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
+    <img style="margin-top: 18%; width: 80px; padding-bottom: 5%;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
 
     <div class="title-container">
       <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">IQOS ILUMA i PRIME</h1>
@@ -174,10 +177,10 @@
     <a-scene
       mindar-image="imageTargetSrc: ./markers/targets2.mind; 
       filterMinCF: 0.0001; 
-      filterBeta: 800;
-      warmupTolerance: 3;
+      filterBeta: 1000;
+      warmupTolerance: 30;
       missTolerance: 5;
-      smoothCount: 60;
+      smoothCount: 80;
       smoothTolerance: 0.005;
       smoothThreshold: 0.5;
       maxTrack: 1;
@@ -221,8 +224,6 @@
     <button class="toggle-features" onclick="toggleFeatures()">Características</button>
 
     <div class="features-dropdown" style="display: none;">
-      <h2>O IQOS ILUMA i PRIME apresenta novas funcionalidades:</h2>
-      
       <div class="feature-item">
         <div class="feature-header">
           <img src="icons/touch.webp" alt="Ecrã Tátil" class="feature-icon">
@@ -253,7 +254,7 @@
         </div>
       </div>
 
-      <div class="feature-item">
+      <div class="feature-item" style="padding-bottom: 50px;">
         <div class="feature-header">
           <img src="icons/battery.webp" alt="FlexBattery" class="feature-icon">
           <div class="feature-title">FlexBattery</div>
