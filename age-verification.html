@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Idade - IQOS</title>
+    <style>
+        @font-face {
+            font-family: 'IQOSSans-Regular';
+            src: url('Fonts/IQOSSans-Regular.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'IQOSSans-Bold';
+            src: url('Fonts/IQOSSans-Bold.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'IQOSSans-Regular', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .select-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 120px;
+            appearance: none;
+            background: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+            background-color: white;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'IQOSSans-Bold', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="images/logo-iluma.png" alt="IQOS Logo" class="logo">
+        <p class="title">Introduza a sua data de nascimento para confirmar que é um utilizador adulto de produtos de tabaco ou nicotina.</p>
+        
+        <div class="select-container">
+            <select id="month" required>
+                <option value="" disabled selected>MÊS *</option>
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+            
+            <select id="year" required>
+                <option value="" disabled selected>ANO *</option>
+            </select>
+        </div>
+
+        <button id="confirmBtn" onclick="verifyAge()">CONFIRMAR</button>
+
+        <p class="disclaimer">Este website contém informação sobre os nossos produtos sem fumo. Precisamos de conhecer a sua idade para assegurar que é um adulto que de outra forma continuaria a fumar ou a usar produtos com nicotina. Os nossos produtos sem fumo não são uma alternativa para deixar de fumar nem foram concebidos como meios de cessação. Não estão isentos de riscos, contêm nicotina que cria dependência e destinam-se exclusivamente a adultos. Consulte a página de Informação Importante no site para mais informações sobre os riscos.</p>
+    </div>
+
+    <script>
+        // Preencher o select de anos (100 anos atrás até o ano atual)
+        const yearSelect = document.getElementById('year');
+        const currentYear = new Date().getFullYear();
+        for (let i = currentYear; i >= currentYear - 100; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
+        }
+
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function calculateAge(birthMonth, birthYear) {
+            const today = new Date();
+            const birthDate = new Date(birthYear, birthMonth - 1);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function verifyAge() {
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+
+            if (!month || !year) {
+                alert('Por favor, selecione o mês e o ano.');
+                return;
+            }
+
+            const age = calculateAge(month, year);
+
+            if (age >= 18) {
+                // Armazenar a verificação de idade por 30 dias
+                setCookie('age_verified', 'true', 30);
+                setCookie('birth_month', month, 30);
+                setCookie('birth_year', year, 30);
+                
+                // Redirecionar para a página principal
+                window.location.href = 'index.html';
+            } else {
+                alert('Desculpe, você precisa ter 18 anos ou mais para acessar este site.');
+                // Redirecionar para um site apropriado para menores
+                window.location.href = 'https://www.google.com';
+            }
+        }
+
+        // Verificar se já existe verificação de idade
+        window.onload = function() {
+            const ageVerified = getCookie('age_verified');
+            if (ageVerified) {
+                const birthMonth = getCookie('birth_month');
+                const birthYear = getCookie('birth_year');
+                const age = calculateAge(birthMonth, birthYear);
+                
+                if (age >= 18) {
+                    // Se já estiver na página principal, não redireciona
+                    if (!window.location.href.includes('index.html')) {
+                        window.location.href = 'index.html';
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html> 
