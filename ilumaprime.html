@@ -171,22 +171,22 @@
 
     <a-scene
       mindar-image="imageTargetSrc: ./markers/targets2.mind; 
-      filterMinCF: 0.01; 
-      filterBeta: 800;
-      warmupTolerance: 10;
-      missTolerance: 25;
-      smoothCount: 70;
-      smoothTolerance: 0.01;
-      smoothThreshold: 1;
+      filterMinCF: 0.001; 
+      filterBeta: 500;
+      warmupTolerance: 5;
+      missTolerance: 10;
+      smoothCount: 30;
+      smoothTolerance: 0.005;
+      smoothThreshold: 0.7;
       maxTrack: 1;
-      minDetectionConfidence: 0.3;
+      minDetectionConfidence: 0.15;
       maxDetectionConfidence: 0.95;
       trackingMethod: best;
-      trackingSmoothingFactor: 0.7;
-      trackingThreshold: 0.3;
-      trackingTimeout: 1000;
-      trackingResetTimeout: 3000;
-      trackingResetThreshold: 0.1;
+      trackingSmoothingFactor: 0.5;
+      trackingThreshold: 0.15;
+      trackingTimeout: 2000;
+      trackingResetTimeout: 5000;
+      trackingResetThreshold: 0.2;
       debugUIEnabled: true"
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
