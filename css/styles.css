@@ -13,6 +13,11 @@ body {
   user-select: none;
 }
 
+h1{
+  font-size: 16px!important;
+  margin-top: 2%!important;
+}
+
 .loading {
   position: fixed;
   top: 0;
