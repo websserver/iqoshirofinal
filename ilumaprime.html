@@ -156,7 +156,7 @@
     <div class="frame">
       <img src="iconheader.svg" alt="Frame">
     </div>
-    <img style="margin-top: 5%; width: 200px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
+    <img style="margin-top: 7%; width: 80px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
 
     <div class="title-container">
       <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">IQOS ILUMA i PRIME</h1>
@@ -171,27 +171,28 @@
 
     <a-scene
       mindar-image="imageTargetSrc: ./markers/targets2.mind; 
-      filterMinCF: 0.001; 
-      filterBeta: 500;
-      warmupTolerance: 5;
-      missTolerance: 10;
-      smoothCount: 30;
-      smoothTolerance: 0.005;
-      smoothThreshold: 0.7;
+      filterMinCF: 0.0001; 
+      filterBeta: 100;
+      warmupTolerance: 3;
+      missTolerance: 5;
+      smoothCount: 10;
+      smoothTolerance: 0.01;
+      smoothThreshold: 0.5;
       maxTrack: 1;
-      minDetectionConfidence: 0.15;
+      minDetectionConfidence: 0.1;
       maxDetectionConfidence: 0.95;
       trackingMethod: best;
-      trackingSmoothingFactor: 0.5;
-      trackingThreshold: 0.15;
-      trackingTimeout: 2000;
-      trackingResetTimeout: 5000;
-      trackingResetThreshold: 0.2;
+      trackingSmoothingFactor: 0.3;
+      trackingThreshold: 0.1;
+      trackingTimeout: 3000;
+      trackingResetTimeout: 6000;
+      trackingResetThreshold: 0.3;
       debugUIEnabled: true"
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false">
+      device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false">
       <a-assets>
         <a-asset-item id="modelo" src="modelo3d/modelo3_prime/navy-blazer.glb"></a-asset-item>
       </a-assets>
@@ -200,7 +201,7 @@
 
       <a-entity mindar-image-target="targetIndex: 0">
         <!-- Container principal para estabilização -->
-        <a-entity id="modelo-container" position="0 0 0">
+        <a-entity id="modelo-container" position="0 0 0" smooth-position smooth-rotation stabilizer>
           <!-- Pontos de ancoragem para estabilização -->
           <a-box position="-0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
           <a-box position="0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
@@ -216,11 +217,9 @@
             scale="8 8 8" 
             class="clickable"
             visible="true"
-            animation-mixer
+            animation-mixer="loop: repeat"
             animation="property: position; dur: 300; easing: easeOutQuad"
-            gesture-handler-custom="minScale: 4; maxScale: 12; rotationSensitivity: 0.2; scaleSensitivity: 0.08"
-            model-loaded="onModelLoaded"
-            model-error="onModelError">
+            gesture-handler-custom="minScale: 4; maxScale: 12; rotationSensitivity: 0.2; scaleSensitivity: 0.08">
           </a-entity>
         </a-entity>
       </a-entity>
@@ -278,32 +277,72 @@
       const sceneEl = document.querySelector('a-scene');
       const modelo = document.querySelector('#modelo3d-1');
       const target = document.querySelector('a-entity[mindar-image-target]');
+      const container = document.querySelector('#modelo-container');
 
-      // Debug events
-      modelo.addEventListener('model-loaded', function() {
-        console.log('Modelo 3D carregado com sucesso');
+      // Debug events com mais detalhes
+      modelo.addEventListener('model-loaded', function(event) {
+        console.log('Modelo 3D carregado com sucesso', event);
         modelo.setAttribute('visible', true);
         modelo.object3D.visible = true;
+        container.object3D.visible = true;
+        
+        // Forçar atualização da matriz mundial
+        modelo.object3D.updateMatrix();
+        modelo.object3D.updateMatrixWorld(true);
+        container.object3D.updateMatrix();
+        container.object3D.updateMatrixWorld(true);
       });
 
       modelo.addEventListener('model-error', function(error) {
         console.error('Erro ao carregar o modelo 3D:', error);
+        // Tentar recarregar o modelo
+        const modelUrl = modelo.getAttribute('gltf-model');
+        setTimeout(() => {
+          console.log('Tentando recarregar o modelo...');
+          modelo.setAttribute('gltf-model', '');
+          setTimeout(() => {
+            modelo.setAttribute('gltf-model', modelUrl);
+          }, 1000);
+        }, 2000);
       });
 
       sceneEl.addEventListener('arReady', function() {
         console.log('MindAR está pronto');
+        // Verificar se o modelo está visível
+        console.log('Estado do modelo:', {
+          visible: modelo.getAttribute('visible'),
+          object3DVisible: modelo.object3D.visible,
+          position: modelo.object3D.position,
+          rotation: modelo.object3D.rotation,
+          scale: modelo.object3D.scale
+        });
       });
 
       sceneEl.addEventListener('arError', function(error) {
         console.error('Erro no MindAR:', error);
       });
 
-      // Target events
+      // Target events com mais informações
       target.addEventListener('targetFound', function() {
         console.log('Marcador encontrado');
         modelo.setAttribute('visible', true);
         modelo.object3D.visible = true;
+        container.object3D.visible = true;
+        
+        // Forçar atualização das matrizes
+        modelo.object3D.updateMatrix();
         modelo.object3D.updateMatrixWorld(true);
+        container.object3D.updateMatrix();
+        container.object3D.updateMatrixWorld(true);
+        
+        console.log('Estado após encontrar marcador:', {
+          modelVisible: modelo.getAttribute('visible'),
+          modelObject3DVisible: modelo.object3D.visible,
+          containerVisible: container.object3D.visible,
+          modelPosition: modelo.object3D.position,
+          modelRotation: modelo.object3D.rotation,
+          modelScale: modelo.object3D.scale
+        });
       });
 
       target.addEventListener('targetLost', function() {
