@@ -156,7 +156,7 @@
     <div class="frame">
       <img src="iconheader.svg" alt="Frame">
     </div>
-    <img style="margin-top: 7%; width: 80px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
+    <img style="margin-top: 11%; width: 80px;" id="logo" src="logo iluma.svg" alt="Logo Iluma">
 
     <div class="title-container">
       <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">IQOS ILUMA i PRIME</h1>
@@ -200,27 +200,16 @@
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <!-- Container principal para estabilização -->
-        <a-entity id="modelo-container" position="0 0 0" smooth-position smooth-rotation stabilizer>
-          <!-- Pontos de ancoragem para estabilização -->
-          <a-box position="-0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
-          <a-box position="0.5 0 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
-          <a-box position="0 0.5 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
-          <a-box position="0 -0.5 0" scale="0.01 0.01 0.01" opacity="0"></a-box>
-          
-          <!-- Modelo 3D centralizado -->
-          <a-entity 
-            id="modelo3d-1" 
-            gltf-model="#modelo"
-            position="0 0 0.1" 
-            rotation="0 0 0" 
-            scale="8 8 8" 
-            class="clickable"
-            visible="true"
-            animation-mixer="loop: repeat"
-            animation="property: position; dur: 300; easing: easeOutQuad"
-            gesture-handler-custom="minScale: 4; maxScale: 12; rotationSensitivity: 0.2; scaleSensitivity: 0.08">
-          </a-entity>
+        <a-entity 
+          id="modelo3d-1" 
+          gltf-model="#modelo"
+          position="0 0 0.1" 
+          rotation="0 0 0" 
+          scale="8 8 8" 
+          class="clickable"
+          animation-mixer="loop: repeat"
+          animation="property: position; dur: 300; easing: easeOutQuad"
+          gesture-handler-custom="minScale: 4; maxScale: 12; rotationSensitivity: 0.2; scaleSensitivity: 0.08">
         </a-entity>
       </a-entity>
     </a-scene>
@@ -275,33 +264,28 @@
 
     <script>
       const sceneEl = document.querySelector('a-scene');
-      const modelo = document.querySelector('#modelo3d-1');
+      const modeloEl = document.querySelector('#modelo3d-1');
       const target = document.querySelector('a-entity[mindar-image-target]');
-      const container = document.querySelector('#modelo-container');
 
       // Debug events com mais detalhes
-      modelo.addEventListener('model-loaded', function(event) {
+      modeloEl.addEventListener('model-loaded', function(event) {
         console.log('Modelo 3D carregado com sucesso', event);
-        modelo.setAttribute('visible', true);
-        modelo.object3D.visible = true;
-        container.object3D.visible = true;
+        modeloEl.object3D.visible = true;
         
         // Forçar atualização da matriz mundial
-        modelo.object3D.updateMatrix();
-        modelo.object3D.updateMatrixWorld(true);
-        container.object3D.updateMatrix();
-        container.object3D.updateMatrixWorld(true);
+        modeloEl.object3D.updateMatrix();
+        modeloEl.object3D.updateMatrixWorld(true);
       });
 
-      modelo.addEventListener('model-error', function(error) {
+      modeloEl.addEventListener('model-error', function(error) {
         console.error('Erro ao carregar o modelo 3D:', error);
         // Tentar recarregar o modelo
-        const modelUrl = modelo.getAttribute('gltf-model');
+        const modelUrl = modeloEl.getAttribute('gltf-model');
         setTimeout(() => {
           console.log('Tentando recarregar o modelo...');
-          modelo.setAttribute('gltf-model', '');
+          modeloEl.setAttribute('gltf-model', '');
           setTimeout(() => {
-            modelo.setAttribute('gltf-model', modelUrl);
+            modeloEl.setAttribute('gltf-model', modelUrl);
           }, 1000);
         }, 2000);
       });
@@ -310,11 +294,11 @@
         console.log('MindAR está pronto');
         // Verificar se o modelo está visível
         console.log('Estado do modelo:', {
-          visible: modelo.getAttribute('visible'),
-          object3DVisible: modelo.object3D.visible,
-          position: modelo.object3D.position,
-          rotation: modelo.object3D.rotation,
-          scale: modelo.object3D.scale
+          visible: modeloEl.getAttribute('visible'),
+          object3DVisible: modeloEl.object3D.visible,
+          position: modeloEl.object3D.position,
+          rotation: modeloEl.object3D.rotation,
+          scale: modeloEl.object3D.scale
         });
       });
 
@@ -325,30 +309,24 @@
       // Target events com mais informações
       target.addEventListener('targetFound', function() {
         console.log('Marcador encontrado');
-        modelo.setAttribute('visible', true);
-        modelo.object3D.visible = true;
-        container.object3D.visible = true;
+        modeloEl.object3D.visible = true;
         
         // Forçar atualização das matrizes
-        modelo.object3D.updateMatrix();
-        modelo.object3D.updateMatrixWorld(true);
-        container.object3D.updateMatrix();
-        container.object3D.updateMatrixWorld(true);
+        modeloEl.object3D.updateMatrix();
+        modeloEl.object3D.updateMatrixWorld(true);
         
         console.log('Estado após encontrar marcador:', {
-          modelVisible: modelo.getAttribute('visible'),
-          modelObject3DVisible: modelo.object3D.visible,
-          containerVisible: container.object3D.visible,
-          modelPosition: modelo.object3D.position,
-          modelRotation: modelo.object3D.rotation,
-          modelScale: modelo.object3D.scale
+          modelVisible: modeloEl.getAttribute('visible'),
+          modelObject3DVisible: modeloEl.object3D.visible,
+          modelPosition: modeloEl.object3D.position,
+          modelRotation: modeloEl.object3D.rotation,
+          modelScale: modeloEl.object3D.scale
         });
       });
 
       target.addEventListener('targetLost', function() {
         console.log('Marcador perdido');
-        modelo.setAttribute('visible', false);
-        modelo.object3D.visible = false;
+        modeloEl.object3D.visible = false;
       });
 
       AFRAME.registerComponent('gesture-handler-custom', {
@@ -430,79 +408,20 @@
       // Componente para suavizar a posição
       AFRAME.registerComponent('smooth-position', {
         schema: {
-          smoothFactor: { type: 'number', default: 0.08 }
+          smoothFactor: { type: 'number', default: 0.3 }
         },
 
         init: function() {
           this.targetPosition = new THREE.Vector3();
           this.currentPosition = new THREE.Vector3();
-          this.el.object3D.getWorldPosition(this.currentPosition);
-          this.isVisible = false;
-          this.lastUpdateTime = 0;
-          this.minUpdateInterval = 1000 / 60; // Aumentar para 60 FPS
-          this.positionHistory = [];
-          this.maxHistoryLength = 5; // Aumentar histórico para mais suavidade
-          this.velocityDamping = 0.85; // Adicionar amortecimento de velocidade
           this.velocity = new THREE.Vector3();
         },
 
-        tick: function(time) {
-          const isVisible = this.el.getAttribute('visible');
-          if (!isVisible) {
-            this.isVisible = false;
-            this.velocity.set(0, 0, 0);
-            return;
-          }
-
-          if (!this.isVisible) {
-            this.isVisible = true;
-            this.el.object3D.getWorldPosition(this.currentPosition);
-            this.positionHistory = [];
-            this.velocity.set(0, 0, 0);
-          }
-
-          if (time - this.lastUpdateTime < this.minUpdateInterval) {
-            return;
-          }
-          this.lastUpdateTime = time;
-
-          this.el.object3D.getWorldPosition(this.targetPosition);
+        tick: function() {
+          const currentWorldPos = this.el.object3D.getWorldPosition(new THREE.Vector3());
           
-          // Adicionar à história de posições com peso
-          this.positionHistory.push({
-            position: this.targetPosition.clone(),
-            weight: 1.0
-          });
-          
-          if (this.positionHistory.length > this.maxHistoryLength) {
-            this.positionHistory.shift();
-          }
-
-          // Calcular média ponderada das últimas posições
-          const averagePosition = new THREE.Vector3();
-          let totalWeight = 0;
-          
-          this.positionHistory.forEach((entry, index) => {
-            const weight = entry.weight * (index + 1); // Posições mais recentes têm mais peso
-            averagePosition.add(entry.position.multiplyScalar(weight));
-            totalWeight += weight;
-          });
-          
-          averagePosition.divideScalar(totalWeight);
-
-          // Calcular velocidade atual
-          this.velocity.subVectors(averagePosition, this.currentPosition);
-          
-          // Aplicar amortecimento à velocidade
-          this.velocity.multiplyScalar(this.velocityDamping);
-          
-          // Atualizar posição atual com velocidade amortecida
-          this.currentPosition.add(this.velocity);
-          
-          // Aplicar suavização adicional
-          this.currentPosition.lerp(averagePosition, this.data.smoothFactor);
-          
-          // Aplicar a posição final
+          // Suavizar a posição
+          this.currentPosition.lerp(currentWorldPos, this.data.smoothFactor);
           this.el.object3D.position.copy(this.currentPosition);
         }
       });
@@ -510,68 +429,18 @@
       // Componente para suavizar a rotação
       AFRAME.registerComponent('smooth-rotation', {
         schema: {
-          smoothFactor: { type: 'number', default: 0.08 }
+          smoothFactor: { type: 'number', default: 0.3 }
         },
 
         init: function() {
-          this.targetRotation = new THREE.Quaternion();
           this.currentRotation = new THREE.Quaternion();
-          this.el.object3D.getWorldQuaternion(this.currentRotation);
-          this.isVisible = false;
-          this.lastUpdateTime = 0;
-          this.minUpdateInterval = 1000 / 60; // Aumentar para 60 FPS
-          this.rotationHistory = [];
-          this.maxHistoryLength = 5; // Aumentar histórico para mais suavidade
-          this.angularVelocity = new THREE.Vector3();
-          this.velocityDamping = 0.85; // Adicionar amortecimento de velocidade
         },
 
-        tick: function(time) {
-          const isVisible = this.el.getAttribute('visible');
-          if (!isVisible) {
-            this.isVisible = false;
-            this.angularVelocity.set(0, 0, 0);
-            return;
-          }
-
-          if (!this.isVisible) {
-            this.isVisible = true;
-            this.el.object3D.getWorldQuaternion(this.currentRotation);
-            this.rotationHistory = [];
-            this.angularVelocity.set(0, 0, 0);
-          }
-
-          if (time - this.lastUpdateTime < this.minUpdateInterval) {
-            return;
-          }
-          this.lastUpdateTime = time;
-
-          this.el.object3D.getWorldQuaternion(this.targetRotation);
+        tick: function() {
+          const currentWorldQuat = this.el.object3D.getWorldQuaternion(new THREE.Quaternion());
           
-          // Adicionar à história de rotações com peso
-          this.rotationHistory.push({
-            rotation: this.targetRotation.clone(),
-            weight: 1.0
-          });
-          
-          if (this.rotationHistory.length > this.maxHistoryLength) {
-            this.rotationHistory.shift();
-          }
-
-          // Calcular média ponderada das últimas rotações
-          const averageRotation = new THREE.Quaternion();
-          let totalWeight = 0;
-          
-          this.rotationHistory.forEach((entry, index) => {
-            const weight = entry.weight * (index + 1);
-            THREE.Quaternion.slerp(averageRotation, entry.rotation, averageRotation, weight / (totalWeight + weight));
-            totalWeight += weight;
-          });
-
-          // Aplicar suavização com amortecimento
-          this.currentRotation.slerp(averageRotation, this.data.smoothFactor);
-          
-          // Aplicar a rotação final
+          // Suavizar a rotação
+          this.currentRotation.slerp(currentWorldQuat, this.data.smoothFactor);
           this.el.object3D.setRotationFromQuaternion(this.currentRotation);
         }
       });
@@ -581,47 +450,26 @@
         init: function() {
           this.lastPosition = new THREE.Vector3();
           this.lastRotation = new THREE.Euler();
-          this.smoothingFactor = 0.1; // Reduzir para mais suavidade
-          this.positionThreshold = 0.001; // Limiar para mudanças de posição
-          this.rotationThreshold = 0.001; // Limiar para mudanças de rotação
+          this.smoothingFactor = 0.3;
         },
         
         tick: function() {
-          const container = document.querySelector('#modelo-container');
-          if (!container) return;
-
-          const currentPosition = container.object3D.position;
-          const currentRotation = container.object3D.rotation;
-
-          // Verificar se a mudança é significativa
-          const positionDelta = currentPosition.distanceTo(this.lastPosition);
-          const rotationDelta = Math.max(
-            Math.abs(currentRotation.x - this.lastRotation.x),
-            Math.abs(currentRotation.y - this.lastRotation.y),
-            Math.abs(currentRotation.z - this.lastRotation.z)
-          );
-
-          // Aplicar suavização apenas se a mudança for significativa
-          if (positionDelta > this.positionThreshold) {
-            currentPosition.lerp(this.lastPosition, this.smoothingFactor);
-          }
+          const object3D = this.el.object3D;
           
-          if (rotationDelta > this.rotationThreshold) {
-            currentRotation.x = THREE.MathUtils.lerp(currentRotation.x, this.lastRotation.x, this.smoothingFactor);
-            currentRotation.y = THREE.MathUtils.lerp(currentRotation.y, this.lastRotation.y, this.smoothingFactor);
-            currentRotation.z = THREE.MathUtils.lerp(currentRotation.z, this.lastRotation.z, this.smoothingFactor);
-          }
-
-          // Atualizar as últimas posições
-          this.lastPosition.copy(currentPosition);
-          this.lastRotation.copy(currentRotation);
+          // Aplicar suavização simples
+          object3D.position.lerp(this.lastPosition, this.smoothingFactor);
+          
+          // Atualizar últimas posições
+          this.lastPosition.copy(object3D.position);
+          this.lastRotation.copy(object3D.rotation);
         }
       });
 
-      // Aplica os componentes de suavização ao container do modelo
-      document.querySelector('#modelo-container').setAttribute('stabilizer', '');
-      document.querySelector('#modelo-container').setAttribute('smooth-position', '');
-      document.querySelector('#modelo-container').setAttribute('smooth-rotation', '');
+      // Garantir visibilidade do modelo quando a cena estiver pronta
+      sceneEl.addEventListener('loaded', function() {
+        console.log('Cena carregada - verificando visibilidade');
+        modeloEl.object3D.visible = true;
+      });
 
       function toggleFeatures() {
         const dropdown = document.querySelector('.features-dropdown');
