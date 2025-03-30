@@ -68,9 +68,10 @@
       }
 
       .feature-icon {
-        width: 24px;
-        height: 24px;
-        margin-right: 10px;
+        width: 40px;
+        height: 40px;
+        margin-bottom: 10px;
+        object-fit: contain;
       }
 
       .feature-title {
@@ -172,17 +173,17 @@
     <a-scene
       mindar-image="imageTargetSrc: ./markers/targets2.mind; 
       filterMinCF: 0.0001; 
-      filterBeta: 100;
+      filterBeta: 800;
       warmupTolerance: 3;
       missTolerance: 5;
-      smoothCount: 10;
-      smoothTolerance: 0.01;
+      smoothCount: 60;
+      smoothTolerance: 0.005;
       smoothThreshold: 0.5;
       maxTrack: 1;
       minDetectionConfidence: 0.1;
       maxDetectionConfidence: 0.95;
       trackingMethod: best;
-      trackingSmoothingFactor: 0.3;
+      trackingSmoothingFactor: 0.7;
       trackingThreshold: 0.1;
       trackingTimeout: 3000;
       trackingResetTimeout: 6000;
@@ -223,7 +224,7 @@
       
       <div class="feature-item">
         <div class="feature-header">
-          <img src="icons/touch.svg" alt="Ecrã Tátil" class="feature-icon">
+          <img src="icons/touch.webp" alt="Ecrã Tátil" class="feature-icon">
           <div class="feature-title">Ecrã Tátil</div>
         </div>
         <div class="feature-description">
@@ -233,7 +234,7 @@
 
       <div class="feature-item">
         <div class="feature-header">
-          <img src="icons/pause.svg" alt="Modo Pausa" class="feature-icon">
+          <img src="icons/pause.webp" alt="Modo Pausa" class="feature-icon">
           <div class="feature-title">Modo Pausa</div>
         </div>
         <div class="feature-description">
@@ -243,7 +244,7 @@
 
       <div class="feature-item">
         <div class="feature-header">
-          <img src="icons/puff.svg" alt="FlexPuff" class="feature-icon">
+          <img src="icons/puff.webp" alt="FlexPuff" class="feature-icon">
           <div class="feature-title">FlexPuff</div>
         </div>
         <div class="feature-description">
@@ -253,7 +254,7 @@
 
       <div class="feature-item">
         <div class="feature-header">
-          <img src="icons/battery.svg" alt="FlexBattery" class="feature-icon">
+          <img src="icons/battery.webp" alt="FlexBattery" class="feature-icon">
           <div class="feature-title">FlexBattery</div>
         </div>
         <div class="feature-description">
